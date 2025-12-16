@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import "../../../../../styles/inputForm.css";
 import { useNavigate } from "react-router-dom";
-import "select2/dist/css/select2.min.css";
-import Select2 from "react-select2-wrapper";
+// import "select2/dist/css/select2.min.css";
+// import Select2 from "react-select2-wrapper";
+import Select from "react-select";
 import "./inputform.css";
 
 const InputForm = () => {
@@ -364,7 +365,7 @@ const InputForm = () => {
               </div> */}
               <div className="col-lg-4 col-md-4">
                 <div className="form-group mb-3">
-                  <Select2
+                  {/*  <Select2
                     className="form-control chemicalSelect"
                     data={chemicalName.map((chem) => ({
                       id: chem.Title,
@@ -418,6 +419,46 @@ const InputForm = () => {
                           selectedChemical?.CAS_No || ""
                         );
                       }
+                    }}
+                  /> */}
+                  <Select
+                    classNamePrefix="react-select"
+                    placeholder="Select or type Chemical Name"
+                    isClearable
+                    isSearchable
+                    options={chemicalName.map((chem) => ({
+                      value: chem.Title,
+                      label: chem.Title,
+                      meta: chem, // keep full object
+                    }))}
+                    value={
+                      watch(`chemicals.${index}.chemicalName`)
+                        ? {
+                            value: watch(`chemicals.${index}.chemicalName`),
+                            label: watch(`chemicals.${index}.chemicalName`),
+                          }
+                        : null
+                    }
+                    onChange={(selected) => {
+                      if (!selected) {
+                        setValue(`chemicals.${index}.chemicalName`, "");
+                        setValue(`chemicals.${index}.chemicalId`, "");
+                        setValue(`chemicals.${index}.casNo`, "");
+                        return;
+                      }
+
+                      setValue(
+                        `chemicals.${index}.chemicalName`,
+                        selected.value
+                      );
+                      setValue(
+                        `chemicals.${index}.chemicalId`,
+                        selected.meta?.id || ""
+                      );
+                      setValue(
+                        `chemicals.${index}.casNo`,
+                        selected.meta?.CAS_No || ""
+                      );
                     }}
                   />
                   {errors.chemicals?.[index]?.chemicalName && (
