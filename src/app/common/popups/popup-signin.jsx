@@ -88,15 +88,19 @@ function SignInPopup() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    //  window.location.href = `${base_url}/api/connect/google`;
-    const response = await fetch(base_url + "/api/connect/google", {
-      method: "get",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  // const handleGoogleLogin = async () => {
+  //   //  window.location.href = `${base_url}/api/connect/google`;
+  //   const response = await fetch(base_url + "/api/connect/google", {
+  //     method: "get",
+  //     credentials: "include",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  // };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${base_url}/api/connect/google`;
   };
 
   // const loginEmployer = () => {
