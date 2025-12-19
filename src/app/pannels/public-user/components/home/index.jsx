@@ -6,13 +6,14 @@ import { publicUser } from "../../../../../globals/route-names";
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Home1Page() {
-  const [token, setToken] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
   useEffect(() => {
     loadScript("js/custom.js");
   });
   const handleCallToAction = (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("jwt");
 
     if (token) {
       navigate("/input-form");
@@ -69,13 +70,13 @@ function Home1Page() {
                 <span
                   className="site-text-primary"
                   style={{
-                    color: "#A6FF3B"
+                    color: "#A6FF3B",
                     // background: "linear-gradient(90deg, #4FACFE, #9066FF)",
                     // WebkitBackgroundClip: "text",
                     // WebkitTextFillColor: "transparent",
                     // backgroundClip: "text",
                     // color: "transparent",
-                    // display: "inline-block",  
+                    // display: "inline-block",
                   }}
                 >
                   One Carbon Atom

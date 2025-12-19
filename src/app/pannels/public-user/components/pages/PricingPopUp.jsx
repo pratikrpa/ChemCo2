@@ -8,7 +8,7 @@ const PricingPopup = ({ onClose }) => {
     >
       <div
         className="bg-white p-4 rounded-4 shadow w-100 position-relative overflow-auto"
-        style={{ maxWidth: "800px", maxHeight: "95vh" }}
+        style={{ maxWidth: "100%", maxHeight: "100vh" }}
       >
         {/* ❌ Close Button */}
         <div className="d-flex  justify-content-end">
@@ -24,7 +24,7 @@ const PricingPopup = ({ onClose }) => {
         </h2>
 
         {/* 🟢 Toggle Button UI */}
-        <div className="d-flex justify-content-center mb-5">
+        {/* <div className="d-flex justify-content-center mb-5">
           <div
             className="d-flex bg-light rounded-pill p-1"
             style={{ gap: "4px" }}
@@ -52,11 +52,11 @@ const PricingPopup = ({ onClose }) => {
               Yearly
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* 💳 Pricing Cards */}
-        <div className="row g-4">
-          {/* Monthly Plan */}
+        {/* <div className="row g-4">
+          Monthly Plan
           <div className="col-md-4">
             <div className="border rounded-4 text-center p-4 h-100">
               <div
@@ -85,7 +85,7 @@ const PricingPopup = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Yearly Plan */}
+          Yearly Plan
           <div className="col-md-4">
             <div
               className="border border-2 border-success rounded-4 text-center p-4 h-100 position-relative"
@@ -142,7 +142,7 @@ const PricingPopup = ({ onClose }) => {
             </div>
           </div>
 
-          {/* One-Time Plan */}
+          One-Time Plan
           <div className="col-md-4">
             <div className="border rounded-4 text-center p-4 h-100">
               <div
@@ -169,6 +169,265 @@ const PricingPopup = ({ onClose }) => {
                 Buy Now
               </button>
             </div>
+          </div>
+        </div> */}
+
+        <div className="pricing-block-outer">
+          <div
+            className="row justify-content-center"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "stretch",
+            }}
+          >
+            <div
+              className="col-lg-3 col-md-6 m-b30"
+              style={{ display: "flex" }}
+            >
+              <div className="pricing-table-1" style={{ flexGrow: 1 }}>
+                <div className="p-table-title">
+                  <h4 className="wt-title">Starter</h4>
+                </div>
+                <div className="p-table-inner">
+                  <div className="p-table-price">
+                    <span>₹999/</span>
+                    <p>mon</p>
+                  </div>
+                  <div className="p-table-list">
+                    <ul>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Unlimited Calculations
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Batch CO₂e Reports
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Certificates (10)
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Dashboards &amp; Analytics
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Custom API
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Priority Support
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Multi-User Access
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Brand-Supplier Sharing
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="p-table-btn">
+                    <p
+                      className="site-button"
+                    >
+                      Purchase Now
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="col-lg-3 col-md-6 p-table-highlight m-b30"
+              style={{ display: "flex" }}
+            >
+              <div
+                className="pricing-table-1 circle-yellow"
+                style={{ flexGrow: 1 }}
+              >
+                <div className="p-table-title">
+                  <h4 className="wt-title">Professional</h4>
+                </div>
+                <div className="p-table-inner">
+                  <div className="p-table-price">
+                    <span>₹2999/</span>
+                    <p>mon</p>
+                  </div>
+                  <div className="p-table-list">
+                    <ul>
+                      <li>
+                        <i className="feather-check" />
+                        Unlimited Calculations
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Batch CO₂e Reports
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Certificates (Unlimited)
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Dashboards &amp; Analytics
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Custom API
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Priority Support
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Multi-User Access (upTo 10)
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Brand-Supplier Sharing
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="p-table-btn">
+                    <p
+                      className="site-button"
+                    >
+                      Purchase Now
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="col-lg-3 col-md-6 m-b30"
+              style={{ display: "flex" }}
+            >
+              <div
+                className="pricing-table-1 circle-pink"
+                style={{ flexGrow: 1 }}
+              >
+                <div className="p-table-recommended">Popular</div>
+                <div className="p-table-title">
+                  <h4 className="wt-title">Enterprise</h4>
+                </div>
+                <div className="p-table-inner">
+                  <div className="p-table-price">
+                    <span>₹49,999/</span>
+                    <p>year + ₹499/user/mon</p>
+                  </div>
+                  <div className="p-table-list">
+                    <ul>
+                      <li>
+                        <i className="feather-check" />
+                        Unlimited Calculations
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Batch CO₂e Reports
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Certificates (Unlimited)
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Dashboards &amp; Analytics
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Custom API
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Priority Support
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Multi-User Access (Unlimited)
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Brand-Supplier Sharing
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="p-table-btn">
+                    <p
+                      className="site-button"
+                    >
+                      Purchase Now
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="col-lg-3 col-md-6 m-b30"
+              style={{ display: "flex" }}
+            >
+              <div
+                className="pricing-table-1 circle-pink"
+                style={{ flexGrow: 1 }}
+              >
+                <div className="p-table-title">
+                  <h4 className="wt-title">Pay-per-use</h4>
+                </div>
+                <div className="p-table-inner">
+                  <div className="p-table-price">
+                    <span>₹499/</span>
+                    <p>each</p>
+                  </div>
+                  <div className="p-table-list">
+                    <ul>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Unlimited Calculations
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Batch CO₂e Reports
+                      </li>
+                      <li>
+                        <i className="feather-check" />
+                        Certificates (1per Purchase)
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Dashboards &amp; Analytics
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Custom API
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Priority Support
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Multi-User Access
+                      </li>
+                      <li>
+                        <i className="feather-x" style={{ color: "red" }} />
+                        Brand-Supplier Sharing
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="p-table-btn">
+                    <p
+                      className="site-button"
+                    >
+                      Purchase Now
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p>Notes: GST extra • Cancel anytime • Team pricing available</p>
           </div>
         </div>
       </div>

@@ -12189,6 +12189,7 @@ ol.comment-list li.comment .comment-respond .comment-form p {
 .google-clr {
   color: #d8483d;
   border-color: #d8483d;
+  cursor: pointer;
 }
 
 /*============================================================================================
