@@ -100,7 +100,7 @@ function SignInPopup() {
   // };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${base_url}/api/connect/google/callback`;
+    window.location.href = `${base_url}/api/connect/google`;
   };
 
   // const loginEmployer = () => {
