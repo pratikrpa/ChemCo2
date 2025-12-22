@@ -1,23 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Loader from "../app/common/loader";
 
 const GoogleCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
-    const jwt = searchParams.get("jwt");
+    if (hasNavigated.current) return;
 
-    if (jwt) {
-      localStorage.setItem("jwt", jwt);
+    const idToken = searchParams.get("id_token");
 
+    if (idToken) {
+      localStorage.setItem("jwt", idToken);
+
+      hasNavigated.current = true;
       navigate("/", { replace: true });
     } else {
-      const signInModal = new window.bootstrap.Modal(
-        document.getElementById("sign_up_popup2")
-      );
-      signInModal.show();
+      const modalEl = document.getElementById("sign_up_popup2");
+
+      if (modalEl) {
+        const signInModal = new window.bootstrap.Modal(modalEl);
+        signInModal.show();
+      }
     }
   }, [navigate, searchParams]);
 
