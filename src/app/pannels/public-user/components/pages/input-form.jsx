@@ -67,7 +67,6 @@ const InputForm = () => {
       try {
         const response = await fetch(base_url + "/api/product-functions", {
           method: "GET",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_TOKEN}`,
@@ -91,7 +90,6 @@ const InputForm = () => {
       try {
         const response = await fetch(base_url + "/api/categories", {
           method: "GET",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_TOKEN}`,
@@ -114,7 +112,6 @@ const InputForm = () => {
       try {
         const response = await fetch(base_url + "/api/chemicals", {
           method: "GET",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_TOKEN}`,
