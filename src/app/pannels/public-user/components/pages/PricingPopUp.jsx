@@ -1,6 +1,65 @@
 import React from "react";
 
 const PricingPopup = ({ onClose }) => {
+  const base_url = process.env.REACT_APP_BASE_URL;
+  const handlePayment = async (amount, planName) => {
+    try {
+      const res = await fetch(base_url + "/api/payments/create", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await res.json();
+
+      const options = {
+        key: "rzp_test_Rppyv9WGlg9Bcp",
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.razorpay_order_id || order.id,
+        name: "ChemCO₂",
+        description: planName,
+
+        handler: async function (response) {
+          const verifyRes = await fetch(base_url + "/api/payments/verify", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+            alert("Payment Successful");
+            onClose();
+          } else {
+            alert("Payment verification failed");
+          }
+        },
+
+        theme: {
+          color: "#137333",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
+    }
+  };
+
   return (
     <div
       className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center"
@@ -233,6 +292,7 @@ const PricingPopup = ({ onClose }) => {
                   <div className="p-table-btn">
                     <p
                       className="site-button"
+                      onClick={() => handlePayment(999, "Starter Plan")}
                     >
                       Purchase Now
                     </p>
@@ -295,6 +355,7 @@ const PricingPopup = ({ onClose }) => {
                   <div className="p-table-btn">
                     <p
                       className="site-button"
+                      onClick={() => handlePayment(2999, "Professional Plan")}
                     >
                       Purchase Now
                     </p>
@@ -358,6 +419,7 @@ const PricingPopup = ({ onClose }) => {
                   <div className="p-table-btn">
                     <p
                       className="site-button"
+                      onClick={() => handlePayment(49999, "Enterprise Plan")}
                     >
                       Purchase Now
                     </p>
@@ -420,6 +482,7 @@ const PricingPopup = ({ onClose }) => {
                   <div className="p-table-btn">
                     <p
                       className="site-button"
+                      onClick={() => handlePayment(499, "Pay Per Use")}
                     >
                       Purchase Now
                     </p>
