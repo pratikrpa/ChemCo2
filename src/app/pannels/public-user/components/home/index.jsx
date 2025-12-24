@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { loadScript, publicUrlFor } from "../../../../../globals/constants";
+import { useEffect } from "react";
+import { loadScript } from "../../../../../globals/constants";
 import JobZImage from "../../../../common/jobz-img";
-import CountUp from "react-countup";
+// import CountUp from "react-countup";
 import { publicUser } from "../../../../../globals/route-names";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -37,6 +37,64 @@ function Home1Page() {
       }
     }
   }, []);
+
+  const base_url = process.env.REACT_APP_BASE_URL;
+  const handlePayment = async (amount, planName) => {
+    try {
+      const res = await fetch(base_url + "/api/payments/create", {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await res.json();
+
+      const options = {
+        key: "rzp_test_Rppyv9WGlg9Bcp",
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.razorpay_order_id || order.id,
+        name: "ChemCO₂",
+        description: planName,
+
+        handler: async function (response) {
+          const verifyRes = await fetch(base_url + "/api/payments/verify", {
+            method: "POST",
+            // credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.status) {
+            alert("Payment Successful");
+          } else {
+            alert("Payment verification failed");
+          }
+        },
+
+        theme: {
+          color: "#137333",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
+    }
+  };
 
   return (
     <>
@@ -820,12 +878,12 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() => handlePayment(999, "Starter Plan")}
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -889,12 +947,14 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() =>
+                              handlePayment(2999, "Professional Plan")
+                            }
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -953,12 +1013,14 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() =>
+                              handlePayment(49999, "Enterprise Plan")
+                            }
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1037,12 +1099,12 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() => handlePayment(499, "Pay Per Use")}
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
