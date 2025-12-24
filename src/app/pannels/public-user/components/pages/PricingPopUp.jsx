@@ -6,7 +6,7 @@ const PricingPopup = ({ onClose }) => {
     try {
       const res = await fetch(base_url + "/api/payments/create", {
         method: "POST",
-        credentials: "include",
+        // credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -26,7 +26,7 @@ const PricingPopup = ({ onClose }) => {
         handler: async function (response) {
           const verifyRes = await fetch(base_url + "/api/payments/verify", {
             method: "POST",
-            credentials: "include",
+            // credentials: "include",
             headers: {
               "Content-Type": "application/json",
             },
@@ -39,7 +39,7 @@ const PricingPopup = ({ onClose }) => {
 
           const verifyData = await verifyRes.json();
 
-          if (verifyData.success) {
+          if (verifyData.status) {
             alert("Payment Successful");
             onClose();
           } else {
