@@ -172,9 +172,33 @@ const dummyResponse = {
 
 const InputFormOutput = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const base_url = process.env.REACT_APP_BASE_URL;
   const location = useLocation();
 
   const outputData = location.state?.data || dummyResponse;
+
+  const handleCheckMemberShip = async () => {
+    const token = localStorage.getItem("jwt");
+    try {
+      const res = await fetch(base_url + "/api/membership/check", {
+        method: "GET",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const response = await res.json();
+      if(response?.hasMembership) {
+        console.log("first=======")
+      }else{
+        setShowPopup(true)
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -281,7 +305,7 @@ const InputFormOutput = () => {
           <div className="d-flex align-items-end justify-content-end">
             <button
               className="btn btn-custom-download"
-              onClick={() => setShowPopup(true)}
+              onClick={() => handleCheckMemberShip()}
             >
               📥 Download
             </button>
