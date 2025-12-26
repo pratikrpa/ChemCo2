@@ -190,7 +190,7 @@ const InputForm = () => {
       if (!response.ok) throw new Error("Something went wrong");
       const responseData = await response.json();
       // console.log("responseData==========" , responseData)
-      alert("Form submitted successfully!");
+      alert(responseData?.message);
       navigate("/input-form-output", { state: responseData });
     } catch (error) {
       console.error("Submit Error:", error.message);

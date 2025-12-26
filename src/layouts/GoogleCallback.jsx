@@ -28,27 +28,22 @@ const GoogleCallback = () => {
   }, [navigate, searchParams]);
 
   useEffect(() => {
-    // 1. Check if we just arrived from Google
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("access_token");
 
+    console.log("first accessToken", accessToken);
+
     if (accessToken) {
-      // 2. This is the "Frontend Task": Hand the token to the Backend
       fetch(
         `${process.env.REACT_APP_BASE_URL}/api/auth/google/callback?access_token=${accessToken}`
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("first" , data)
+          console.log("first", data);
           if (data.jwt) {
-            // 3. Store the Strapi session
             localStorage.setItem("jwt", data.jwt);
             localStorage.setItem("user", JSON.stringify(data.user));
-
-            // 4. Clean the URL so the token disappears from the address bar
             window.history.replaceState({}, document.title, "/");
-
-            // Optional: Refresh or redirect
             window.location.reload();
           }
         })
