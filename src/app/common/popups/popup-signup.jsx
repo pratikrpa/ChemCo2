@@ -504,6 +504,9 @@ function SignUpPopup() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${base_url}/api/connect/google`;
+  };
   return (
     <>
       {success && (
@@ -647,7 +650,7 @@ function SignUpPopup() {
               <div className="modal-footer">
                 <span className="modal-f-title">Login or Sign up with</span>
                 <ul className="twm-modal-social">
-                  <li>
+                  {/* <li>
                     <a
                       href="https://www.facebook.com/"
                       className="facebook-clr"
@@ -664,11 +667,11 @@ function SignUpPopup() {
                     <a href="https://in.linkedin.com/" className="linkedin-clr">
                       <i className="fab fa-linkedin-in" />
                     </a>
-                  </li>
+                  </li> */}
                   <li>
-                    <a href="https://www.google.com/" className="google-clr">
+                    <p onClick={handleGoogleLogin} className="google-clr">
                       <i className="fab fa-google" />
-                    </a>
+                    </p>
                   </li>
                 </ul>
               </div>

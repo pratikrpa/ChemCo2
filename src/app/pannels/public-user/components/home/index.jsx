@@ -4,6 +4,8 @@ import JobZImage from "../../../../common/jobz-img";
 // import CountUp from "react-countup";
 import { publicUser } from "../../../../../globals/route-names";
 import { NavLink, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Home1Page() {
   const navigate = useNavigate();
@@ -77,9 +79,11 @@ function Home1Page() {
           const verifyData = await verifyRes.json();
 
           if (verifyData.status) {
-            alert("Payment Successful");
+            toast.success("Payment successful!", {
+              autoClose: 1500,
+            });
           } else {
-            alert("Payment verification failed");
+            toast.error("Payment verification failed");
           }
         },
 
@@ -92,12 +96,22 @@ function Home1Page() {
       razorpay.open();
     } catch (err) {
       console.error(err);
-      alert("Payment failed");
+      toast.error("Payment failed");
     }
   };
 
   return (
     <>
+      {/* alert */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       {/*Banner Start*/}
       <div
         className="twm-home1-banner-section site-bg-gray bg-cover"

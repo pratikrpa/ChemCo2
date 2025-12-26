@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 // import Select2 from "react-select2-wrapper";
 import Select from "react-select";
 import "./inputform.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const InputForm = () => {
   const base_url = process.env.REACT_APP_BASE_URL;
@@ -189,145 +191,161 @@ const InputForm = () => {
 
       if (!response.ok) throw new Error("Something went wrong");
       const responseData = await response.json();
-      // console.log("responseData==========" , responseData)
-      alert(responseData?.message);
-      navigate("/input-form-output", { state: responseData });
+      toast.success(responseData?.message, {
+        autoClose: 1500,
+      });
+
+      setTimeout(() => {
+        navigate("/input-form-output", { state: responseData });
+      }, 1600);
     } catch (error) {
       console.error("Submit Error:", error.message);
-      alert("Failed to submit form.");
+      toast.error("Failed to submit form.");
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="inputFormSec"
-      method="post"
-    >
-      <div className="row">
-        <div className="col-lg-4 col-md-4">
-          <p className="fs-3 fw-bolder">Project & Fabric Details</p>
-        </div>
-      </div>
-      <div className="row">
-        {/* Project & Fabric Details */}
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <input
-              type="text"
-              {...register("projectName", { required: "Required" })}
-              className="form-control"
-              placeholder="Project Name"
-            />
-            {errors.projectName && (
-              <p className="text-danger">{errors.projectName.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <input
-              type="date"
-              {...register("date", { required: "Required" })}
-              className="form-control"
-              placeholder="Date"
-            />
-            {errors.date && (
-              <p className="text-danger">{errors.date.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <select
-              {...register("fabricType", { required: "Required" })}
-              className="form-control"
-            >
-              <option value="">Fabric Type</option>
-              <option value="cotton">Cotton</option>
-              <option value="polyester">Polyester</option>
-              <option value="blended">Blended</option>
-            </select>
-            {errors.fabricType && (
-              <p className="text-danger">{errors.fabricType.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <input
-              type="number"
-              {...register("gsm", { required: "Required" })}
-              className="form-control"
-              placeholder="Fabric Weight (GSM)"
-            />
-            {errors.gsm && <p className="text-danger">{errors.gsm.message}</p>}
-          </div>
-        </div>
-
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <input
-              type="number"
-              {...register("quantity", { required: "Required" })}
-              className="form-control"
-              placeholder="Fabric Quantity (kg)"
-            />
-            {errors.quantity && (
-              <p className="text-danger">{errors.quantity.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-lg-4 col-md-4">
-          <div className="form-group mb-3">
-            <input
-              type="number"
-              step="0.01"
-              // onInput={(e) => {
-              //   // Limit to 2 decimal places
-              //   if (e.target.value.includes(".")) {
-              //     const parts = e.target.value.split(".");
-              //     if (parts[1] && parts[1].length > 2) {
-              //       e.target.value = parseFloat(e.target.value).toFixed(2);
-              //     }
-              //   }
-              // }}
-              {...register("pickup", { required: "Required" })}
-              className="form-control"
-              placeholder="Assumed Pickup per KG of Fabric (%)"
-            />
-            {errors.pickup && (
-              <p className="text-danger">{errors.pickup.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="row mt-4">
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="inputFormSec"
+        method="post"
+      >
+        <div className="row">
           <div className="col-lg-4 col-md-4">
-            <p className="fs-3 fw-bolder">Chemical Usage</p>
+            <p className="fs-3 fw-bolder">Project & Fabric Details</p>
           </div>
         </div>
-        {/* Chemical Usage */}
-        {fields.map((field, index) => (
-          <React.Fragment key={field.id}>
-            <div className="row mt-4">
-              <div className="col-lg-4 col-md-4 d-none">
-                <div className="form-group mb-3">
-                  <input
-                    type="number"
-                    {...register(`chemicals.${index}.chemicalId`)}
-                    className="form-control"
-                    placeholder="Chemical ID"
-                    readOnly
-                  />
-                </div>
-              </div>
+        <div className="row">
+          {/* Project & Fabric Details */}
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <input
+                type="text"
+                {...register("projectName", { required: "Required" })}
+                className="form-control"
+                placeholder="Project Name"
+              />
+              {errors.projectName && (
+                <p className="text-danger">{errors.projectName.message}</p>
+              )}
+            </div>
+          </div>
 
-              {/* <div className="col-lg-4 col-md-4">
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <input
+                type="date"
+                {...register("date", { required: "Required" })}
+                className="form-control"
+                placeholder="Date"
+              />
+              {errors.date && (
+                <p className="text-danger">{errors.date.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <select
+                {...register("fabricType", { required: "Required" })}
+                className="form-control"
+              >
+                <option value="">Fabric Type</option>
+                <option value="cotton">Cotton</option>
+                <option value="polyester">Polyester</option>
+                <option value="blended">Blended</option>
+              </select>
+              {errors.fabricType && (
+                <p className="text-danger">{errors.fabricType.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <input
+                type="number"
+                {...register("gsm", { required: "Required" })}
+                className="form-control"
+                placeholder="Fabric Weight (GSM)"
+              />
+              {errors.gsm && (
+                <p className="text-danger">{errors.gsm.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <input
+                type="number"
+                {...register("quantity", { required: "Required" })}
+                className="form-control"
+                placeholder="Fabric Quantity (kg)"
+              />
+              {errors.quantity && (
+                <p className="text-danger">{errors.quantity.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-4 col-md-4">
+            <div className="form-group mb-3">
+              <input
+                type="number"
+                step="0.01"
+                // onInput={(e) => {
+                //   // Limit to 2 decimal places
+                //   if (e.target.value.includes(".")) {
+                //     const parts = e.target.value.split(".");
+                //     if (parts[1] && parts[1].length > 2) {
+                //       e.target.value = parseFloat(e.target.value).toFixed(2);
+                //     }
+                //   }
+                // }}
+                {...register("pickup", { required: "Required" })}
+                className="form-control"
+                placeholder="Assumed Pickup per KG of Fabric (%)"
+              />
+              {errors.pickup && (
+                <p className="text-danger">{errors.pickup.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="row mt-4">
+            <div className="col-lg-4 col-md-4">
+              <p className="fs-3 fw-bolder">Chemical Usage</p>
+            </div>
+          </div>
+          {/* Chemical Usage */}
+          {fields.map((field, index) => (
+            <React.Fragment key={field.id}>
+              <div className="row mt-4">
+                <div className="col-lg-4 col-md-4 d-none">
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      {...register(`chemicals.${index}.chemicalId`)}
+                      className="form-control"
+                      placeholder="Chemical ID"
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                {/* <div className="col-lg-4 col-md-4">
                 <div className="form-group mb-3">
                   <select
                     {...register(`chemicals.${index}.chemicalName`, {
@@ -363,9 +381,9 @@ const InputForm = () => {
                   )}
                 </div>
               </div> */}
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  {/*  <Select2
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    {/*  <Select2
                     className="form-control chemicalSelect"
                     data={chemicalName.map((chem) => ({
                       id: chem.Title,
@@ -421,282 +439,283 @@ const InputForm = () => {
                       }
                     }}
                   /> */}
-                  <Select
-                    classNamePrefix="react-select"
-                    placeholder="Select or type Chemical Name"
-                    isClearable
-                    isSearchable
-                    options={chemicalName.map((chem) => ({
-                      value: chem.Title,
-                      label: chem.Title,
-                      meta: chem, // keep full object
-                    }))}
-                    value={
-                      watch(`chemicals.${index}.chemicalName`)
-                        ? {
-                            value: watch(`chemicals.${index}.chemicalName`),
-                            label: watch(`chemicals.${index}.chemicalName`),
-                          }
-                        : null
-                    }
-                    onChange={(selected) => {
-                      if (!selected) {
-                        setValue(`chemicals.${index}.chemicalName`, "");
-                        setValue(`chemicals.${index}.chemicalId`, "");
-                        setValue(`chemicals.${index}.casNo`, "");
-                        return;
+                    <Select
+                      classNamePrefix="react-select"
+                      placeholder="Select or type Chemical Name"
+                      isClearable
+                      isSearchable
+                      options={chemicalName.map((chem) => ({
+                        value: chem.Title,
+                        label: chem.Title,
+                        meta: chem, // keep full object
+                      }))}
+                      value={
+                        watch(`chemicals.${index}.chemicalName`)
+                          ? {
+                              value: watch(`chemicals.${index}.chemicalName`),
+                              label: watch(`chemicals.${index}.chemicalName`),
+                            }
+                          : null
                       }
+                      onChange={(selected) => {
+                        if (!selected) {
+                          setValue(`chemicals.${index}.chemicalName`, "");
+                          setValue(`chemicals.${index}.chemicalId`, "");
+                          setValue(`chemicals.${index}.casNo`, "");
+                          return;
+                        }
 
-                      setValue(
-                        `chemicals.${index}.chemicalName`,
-                        selected.value
-                      );
-                      setValue(
-                        `chemicals.${index}.chemicalId`,
-                        selected.meta?.id || ""
-                      );
-                      setValue(
-                        `chemicals.${index}.casNo`,
-                        selected.meta?.CAS_No || ""
-                      );
-                    }}
-                  />
-                  {errors.chemicals?.[index]?.chemicalName && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].chemicalName.message}
-                    </p>
-                  )}
+                        setValue(
+                          `chemicals.${index}.chemicalName`,
+                          selected.value
+                        );
+                        setValue(
+                          `chemicals.${index}.chemicalId`,
+                          selected.meta?.id || ""
+                        );
+                        setValue(
+                          `chemicals.${index}.casNo`,
+                          selected.meta?.CAS_No || ""
+                        );
+                      }}
+                    />
+                    {errors.chemicals?.[index]?.chemicalName && (
+                      <p className="text-danger">
+                        {errors.chemicals[index].chemicalName.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <input
-                    type="text"
-                    {...register(`chemicals.${index}.casNo`)}
-                    className="form-control"
-                    placeholder="CAS No."
-                    readOnly
-                  />
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <input
+                      type="text"
+                      {...register(`chemicals.${index}.casNo`)}
+                      className="form-control"
+                      placeholder="CAS No."
+                      readOnly
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`chemicals.${index}.fossilCarbon`, {
-                      required: "Required",
-                    })}
-                    className="form-control"
-                    placeholder="Fossil carbon (%)"
-                  />
-                  {errors.chemicals?.[index]?.fossilCarbon && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].fossilCarbon.message}
-                    </p>
-                  )}
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      step="0.01"
+                      {...register(`chemicals.${index}.fossilCarbon`, {
+                        required: "Required",
+                      })}
+                      className="form-control"
+                      placeholder="Fossil carbon (%)"
+                    />
+                    {errors.chemicals?.[index]?.fossilCarbon && (
+                      <p className="text-danger">
+                        {errors.chemicals[index].fossilCarbon.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`chemicals.${index}.dosage`, {
-                      required: "Required",
-                    })}
-                    className="form-control"
-                    placeholder="Dosage (%)"
-                  />
-                  {errors.chemicals?.[index]?.dosage && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].dosage.message}
-                    </p>
-                  )}
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      step="0.01"
+                      {...register(`chemicals.${index}.dosage`, {
+                        required: "Required",
+                      })}
+                      className="form-control"
+                      placeholder="Dosage (%)"
+                    />
+                    {errors.chemicals?.[index]?.dosage && (
+                      <p className="text-danger">
+                        {errors.chemicals[index].dosage.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`chemicals.${index}.activeFormulation`, {
-                      required: "Required",
-                    })}
-                    className="form-control"
-                    placeholder="Active in formulation"
-                  />
-                  {errors.chemicals?.[index]?.activeFormulation && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].activeFormulation.message}
-                    </p>
-                  )}
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      step="0.01"
+                      {...register(`chemicals.${index}.activeFormulation`, {
+                        required: "Required",
+                      })}
+                      className="form-control"
+                      placeholder="Active in formulation"
+                    />
+                    {errors.chemicals?.[index]?.activeFormulation && (
+                      <p className="text-danger">
+                        {errors.chemicals[index].activeFormulation.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <select
-                    {...register(`chemicals.${index}.productFunction`, {
-                      required: "Required",
-                    })}
-                    className="form-control"
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <select
+                      {...register(`chemicals.${index}.productFunction`, {
+                        required: "Required",
+                      })}
+                      className="form-control"
+                    >
+                      <option value="">Product Function</option>
+                      {productFunctions.map((productFunction) => (
+                        <option
+                          key={productFunction.id}
+                          value={productFunction.title}
+                        >
+                          {productFunction.title}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.chemicals?.[index]?.productFunction && (
+                      <p className="text-danger">
+                        {errors.chemicals[index].productFunction.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <input
+                      type="number"
+                      step="0.01"
+                      {...register(`chemicals.${index}.bioPercent`)}
+                      className="form-control"
+                      placeholder="Bio-based %"
+                    />
+                  </div>
+                </div>
+
+                <div className="col-lg-4 col-md-4">
+                  <div className="form-group mb-3">
+                    <select
+                      {...register(`chemicals.${index}.applicationStageName`)}
+                      className="form-control"
+                      onChange={(e) => {
+                        const selectedName = e.target.value;
+                        const selectedStage = applicationStageName.find(
+                          (stage) => stage.name === selectedName
+                        );
+                        setValue(
+                          `chemicals.${index}.applicationStageId`,
+                          selectedStage?.id || ""
+                        );
+                        setValue(
+                          `chemicals.${index}.applicationStageName`,
+                          selectedName
+                        );
+                      }}
+                    >
+                      <option value="">Application Stage Name</option>
+                      {applicationStageName.map((stage) => (
+                        <option key={stage.id} value={stage.name}>
+                          {stage.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="col-md-12 text-end">
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="btn btn-danger btn-sm mb-3"
                   >
-                    <option value="">Product Function</option>
-                    {productFunctions.map((productFunction) => (
-                      <option
-                        key={productFunction.id}
-                        value={productFunction.title}
-                      >
-                        {productFunction.title}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.chemicals?.[index]?.productFunction && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].productFunction.message}
-                    </p>
-                  )}
+                    Remove Chemical
+                  </button>
                 </div>
               </div>
+            </React.Fragment>
+          ))}
 
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register(`chemicals.${index}.bioPercent`)}
-                    className="form-control"
-                    placeholder="Bio-based %"
-                  />
-                </div>
-              </div>
-
-              <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <select
-                    {...register(`chemicals.${index}.applicationStageName`)}
-                    className="form-control"
-                    onChange={(e) => {
-                      const selectedName = e.target.value;
-                      const selectedStage = applicationStageName.find(
-                        (stage) => stage.name === selectedName
-                      );
-                      setValue(
-                        `chemicals.${index}.applicationStageId`,
-                        selectedStage?.id || ""
-                      );
-                      setValue(
-                        `chemicals.${index}.applicationStageName`,
-                        selectedName
-                      );
-                    }}
-                  >
-                    <option value="">Application Stage Name</option>
-                    {applicationStageName.map((stage) => (
-                      <option key={stage.id} value={stage.name}>
-                        {stage.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="col-md-12 text-end">
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="btn btn-danger btn-sm mb-3"
-                >
-                  Remove Chemical
-                </button>
-              </div>
-            </div>
-          </React.Fragment>
-        ))}
-
-        <div className="col-md-12 mb-3">
-          <button
-            type="button"
-            onClick={() =>
-              append({
-                chemicalId: "",
-                chemicalName: "",
-                casNo: "",
-                applicationStageId: "",
-                applicationStageName: "",
-                fossilCarbon: "",
-                dosage: "",
-                activeFormulation: "",
-                productFunction: "",
-                bioPercent: "",
-              })
-            }
-            className="btn btn-link"
-          >
-            + Add Another Chemical
-          </button>
-        </div>
-
-        <div className="row mt-4">
-          <div className="col-lg-4 col-md-4">
-            <p className="fs-3 fw-bolder">Additives & Notes</p>
-          </div>
-        </div>
-        {/* Additives & Notes */}
-        <div className="col-lg-6 col-md-6">
-          <div className="form-group mb-3">
-            <input
-              type="text"
-              {...register("additives", { required: "Required" })}
-              className="form-control"
-              placeholder="Additives / Enzymes"
-            />
-            {errors.additives && (
-              <p className="text-danger">{errors.additives.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="col-lg-6 col-md-6">
-          <div className="form-group mb-3">
-            <select
-              {...register("carbonSource", { required: "Required" })}
-              className="form-control"
+          <div className="col-md-12 mb-3">
+            <button
+              type="button"
+              onClick={() =>
+                append({
+                  chemicalId: "",
+                  chemicalName: "",
+                  casNo: "",
+                  applicationStageId: "",
+                  applicationStageName: "",
+                  fossilCarbon: "",
+                  dosage: "",
+                  activeFormulation: "",
+                  productFunction: "",
+                  bioPercent: "",
+                })
+              }
+              className="btn btn-link"
             >
-              <option value="">Estimated Carbon Source</option>
-              <option value="fossil">Fossil</option>
-              <option value="bio">Bio</option>
-              <option value="mixed">Mixed</option>
-            </select>
-            {errors.carbonSource && (
-              <p className="text-danger">{errors.carbonSource.message}</p>
-            )}
+              + Add Another Chemical
+            </button>
+          </div>
+
+          <div className="row mt-4">
+            <div className="col-lg-4 col-md-4">
+              <p className="fs-3 fw-bolder">Additives & Notes</p>
+            </div>
+          </div>
+          {/* Additives & Notes */}
+          <div className="col-lg-6 col-md-6">
+            <div className="form-group mb-3">
+              <input
+                type="text"
+                {...register("additives", { required: "Required" })}
+                className="form-control"
+                placeholder="Additives / Enzymes"
+              />
+              {errors.additives && (
+                <p className="text-danger">{errors.additives.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-6 col-md-6">
+            <div className="form-group mb-3">
+              <select
+                {...register("carbonSource", { required: "Required" })}
+                className="form-control"
+              >
+                <option value="">Estimated Carbon Source</option>
+                <option value="fossil">Fossil</option>
+                <option value="bio">Bio</option>
+                <option value="mixed">Mixed</option>
+              </select>
+              {errors.carbonSource && (
+                <p className="text-danger">{errors.carbonSource.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <textarea
+                {...register("notes")}
+                className="form-control"
+                rows={3}
+                placeholder="Additional Notes"
+              ></textarea>
+            </div>
+          </div>
+
+          <div className="col-md-12">
+            <button type="submit" className="site-button">
+              Submit Now
+            </button>
           </div>
         </div>
-
-        <div className="col-lg-12">
-          <div className="form-group mb-3">
-            <textarea
-              {...register("notes")}
-              className="form-control"
-              rows={3}
-              placeholder="Additional Notes"
-            ></textarea>
-          </div>
-        </div>
-
-        <div className="col-md-12">
-          <button type="submit" className="site-button">
-            Submit Now
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 
