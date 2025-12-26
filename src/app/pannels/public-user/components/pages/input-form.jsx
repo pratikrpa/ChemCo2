@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import "../../../../../styles/inputForm.css";
 import { useNavigate } from "react-router-dom";
 // import "select2/dist/css/select2.min.css";
 // import Select2 from "react-select2-wrapper";
-import Select from "react-select";
+// import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import "./inputform.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -439,7 +440,7 @@ const InputForm = () => {
                       }
                     }}
                   /> */}
-                    <Select
+                    {/* <Select
                       classNamePrefix="react-select"
                       placeholder="Select or type Chemical Name"
                       isClearable
@@ -478,7 +479,60 @@ const InputForm = () => {
                           selected.meta?.CAS_No || ""
                         );
                       }}
+                    /> */}
+                    <Controller
+                      control={control}
+                      name={`chemicals.${index}.chemicalName`}
+                      rules={{ required: "Required" }}
+                      render={({ field }) => (
+                        <CreatableSelect
+                          {...field}
+                          classNamePrefix="react-select"
+                          placeholder="Select or type Chemical Name"
+                          isClearable
+                          isSearchable
+                          options={chemicalName.map((chem) => ({
+                            value: chem.Title,
+                            label: chem.Title,
+                            meta: chem,
+                          }))}
+                          value={
+                            field.value
+                              ? { value: field.value, label: field.value }
+                              : null
+                          }
+                          onChange={(selected) => {
+                            if (!selected) {
+                              field.onChange("");
+                              setValue(`chemicals.${index}.chemicalId`, "");
+                              setValue(`chemicals.${index}.casNo`, "");
+                              return;
+                            }
+
+                            field.onChange(selected.value);
+
+                            // Only set ID & CAS if it's from API
+                            setValue(
+                              `chemicals.${index}.chemicalId`,
+                              selected.meta?.id || ""
+                            );
+                            setValue(
+                              `chemicals.${index}.casNo`,
+                              selected.meta?.CAS_No || ""
+                            );
+                          }}
+                          onCreateOption={(inputValue) => {
+                            // 🔥 THIS saves typed value
+                            field.onChange(inputValue);
+
+                            // No ID / CAS for custom chemical
+                            setValue(`chemicals.${index}.chemicalId`, "");
+                            setValue(`chemicals.${index}.casNo`, "");
+                          }}
+                        />
+                      )}
                     />
+
                     {errors.chemicals?.[index]?.chemicalName && (
                       <p className="text-danger">
                         {errors.chemicals[index].chemicalName.message}
