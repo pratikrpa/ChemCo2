@@ -138,6 +138,41 @@ const InputForm = () => {
     fetchChemicalName();
   }, []);
 
+  const createChemical = async (name) => {
+    try {
+      const response = await fetch(base_url + "/api/chemicals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: {
+            chemical_name: name,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create chemical");
+      }
+
+      const result = await response.json();
+
+      return {
+        id: null,
+        Title: name,
+        CAS_No: result.CAS_No || "",
+        source: result.source,
+      };
+    } catch (error) {
+      console.error("Create chemical error:", error);
+      toast.error("Failed to add chemical");
+      return null;
+    }
+  };
+
+
+
   const transformFormData = (formData) => {
     return {
       projectName: formData.projectName,
@@ -306,15 +341,6 @@ const InputForm = () => {
               <input
                 type="number"
                 step="0.01"
-                // onInput={(e) => {
-                //   // Limit to 2 decimal places
-                //   if (e.target.value.includes(".")) {
-                //     const parts = e.target.value.split(".");
-                //     if (parts[1] && parts[1].length > 2) {
-                //       e.target.value = parseFloat(e.target.value).toFixed(2);
-                //     }
-                //   }
-                // }}
                 {...register("pickup", { required: "Required" })}
                 className="form-control"
                 placeholder="Assumed Pickup per KG of Fabric (%)"
@@ -345,141 +371,8 @@ const InputForm = () => {
                     />
                   </div>
                 </div>
-
-                {/* <div className="col-lg-4 col-md-4">
-                <div className="form-group mb-3">
-                  <select
-                    {...register(`chemicals.${index}.chemicalName`, {
-                      required: "Required",
-                    })}
-                    className="form-control"
-                    onChange={(e) => {
-                      const selectedName = e.target.value;
-                      const selectedChemical = chemicalName.find(
-                        (chem) => chem.Title === selectedName
-                      );
-                      setValue(
-                        `chemicals.${index}.chemicalId`,
-                        selectedChemical?.id || ""
-                      );
-                      setValue(
-                        `chemicals.${index}.casNo`,
-                        selectedChemical?.CAS_No || ""
-                      );
-                    }}
-                  >
-                    <option value="">Select Chemical Name</option>
-                    {chemicalName.map((chem) => (
-                      <option key={chem.id} value={chem.Title}>
-                        {chem.Title}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.chemicals?.[index]?.chemicalName && (
-                    <p className="text-danger">
-                      {errors.chemicals[index].chemicalName.message}
-                    </p>
-                  )}
-                </div>
-              </div> */}
                 <div className="col-lg-4 col-md-4">
                   <div className="form-group mb-3">
-                    {/*  <Select2
-                    className="form-control chemicalSelect"
-                    data={chemicalName.map((chem) => ({
-                      id: chem.Title,
-                      text: `${chem.Title}`,
-                    }))}
-                    value={watch(`chemicals.${index}.chemicalName`) || ""}
-                    options={{
-                      placeholder: "Select or type Chemical Name",
-                      allowClear: true,
-                      tags: true,
-                      createTag: function (params) {
-                        return {
-                          id: params.term,
-                          text: params.term,
-                          newTag: true,
-                        };
-                      },
-                    }}
-                    onSelect={(e) => {
-                      const selectedName = e.target.value;
-                      const selectedChemical = chemicalName.find(
-                        (chem) => chem.Title === selectedName
-                      );
-
-                      setValue(`chemicals.${index}.chemicalName`, selectedName);
-                      setValue(
-                        `chemicals.${index}.chemicalId`,
-                        selectedChemical?.id || ""
-                      );
-                      setValue(
-                        `chemicals.${index}.casNo`,
-                        selectedChemical?.CAS_No || ""
-                      );
-                    }}
-                    onChange={(e) => {
-                      const typedName = e.target.value;
-
-                      // Handle both selection and typing
-                      if (typeof typedName === "string") {
-                        const selectedChemical = chemicalName.find(
-                          (chem) => chem.Title === typedName
-                        );
-
-                        setValue(`chemicals.${index}.chemicalName`, typedName);
-                        setValue(
-                          `chemicals.${index}.chemicalId`,
-                          selectedChemical?.id || ""
-                        );
-                        setValue(
-                          `chemicals.${index}.casNo`,
-                          selectedChemical?.CAS_No || ""
-                        );
-                      }
-                    }}
-                  /> */}
-                    {/* <Select
-                      classNamePrefix="react-select"
-                      placeholder="Select or type Chemical Name"
-                      isClearable
-                      isSearchable
-                      options={chemicalName.map((chem) => ({
-                        value: chem.Title,
-                        label: chem.Title,
-                        meta: chem, // keep full object
-                      }))}
-                      value={
-                        watch(`chemicals.${index}.chemicalName`)
-                          ? {
-                              value: watch(`chemicals.${index}.chemicalName`),
-                              label: watch(`chemicals.${index}.chemicalName`),
-                            }
-                          : null
-                      }
-                      onChange={(selected) => {
-                        if (!selected) {
-                          setValue(`chemicals.${index}.chemicalName`, "");
-                          setValue(`chemicals.${index}.chemicalId`, "");
-                          setValue(`chemicals.${index}.casNo`, "");
-                          return;
-                        }
-
-                        setValue(
-                          `chemicals.${index}.chemicalName`,
-                          selected.value
-                        );
-                        setValue(
-                          `chemicals.${index}.chemicalId`,
-                          selected.meta?.id || ""
-                        );
-                        setValue(
-                          `chemicals.${index}.casNo`,
-                          selected.meta?.CAS_No || ""
-                        );
-                      }}
-                    /> */}
                     <Controller
                       control={control}
                       name={`chemicals.${index}.chemicalName`}
@@ -521,13 +414,18 @@ const InputForm = () => {
                               selected.meta?.CAS_No || ""
                             );
                           }}
-                          onCreateOption={(inputValue) => {
-                            // 🔥 THIS saves typed value
-                            field.onChange(inputValue);
+                          onCreateOption={async (inputValue) => {
+                            const newChemical = await createChemical(inputValue);
+                            if (!newChemical) return;
 
-                            // No ID / CAS for custom chemical
-                            setValue(`chemicals.${index}.chemicalId`, "");
-                            setValue(`chemicals.${index}.casNo`, "");
+                            // add to options
+                            setChemicalName((prev) => [...prev, newChemical]);
+
+                            // set select value
+                            field.onChange(newChemical.Title);
+
+                            // set CAS No
+                            setValue(`chemicals.${index}.casNo`, newChemical.CAS_No);
                           }}
                         />
                       )}
