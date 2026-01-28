@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+// import { useNavigate, useSearchParams } from "react-router-dom";
 import Loader from "../app/common/loader";
 
 const GoogleCallback = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const hasNavigated = useRef(false);
+  // const navigate = useNavigate();
+  // const [searchParams] = useSearchParams();
+  // const hasNavigated = useRef(false);
 
   // useEffect(() => {
   //   if (hasNavigated.current) return;
