@@ -21,6 +21,7 @@ const HistoryRecord = () => {
         base_url + "/api/fabric-co2e/user/calculations",
         {
           method: "GET",
+          credentials:"include",
           headers: {
             "Content-Type": "application/json",
             "x-user-token": token,

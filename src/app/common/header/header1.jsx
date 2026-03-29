@@ -143,7 +143,7 @@ function Header1({ _config }) {
                   </li>
 
                   <li className="has-mega-menu">
-                    <a onClick={handleApiClick}>API</a>
+                    <a onClick={handleApiClick}>Calculator</a>
                   </li>
                   {/* <li className="has-mega-menu">
                       <a href="#">Home</a>

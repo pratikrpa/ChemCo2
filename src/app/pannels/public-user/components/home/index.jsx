@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
-import { loadScript, publicUrlFor } from "../../../../../globals/constants";
+import { loadScript } from "../../../../../globals/constants";
 import JobZImage from "../../../../common/jobz-img";
-import CountUp from "react-countup";
+// import CountUp from "react-countup";
 import { publicUser } from "../../../../../globals/route-names";
 import { NavLink, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Home1Page() {
-  const [token, setToken] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+
   useEffect(() => {
     loadScript("js/custom.js");
   });
   const handleCallToAction = (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("jwt");
 
     if (token) {
       navigate("/input-form");
@@ -37,8 +42,141 @@ function Home1Page() {
     }
   }, []);
 
+  const base_url = process.env.REACT_APP_BASE_URL;
+
+  const handleCheckMembership = async () => {
+    const token = localStorage.getItem("jwt");
+
+    const res = await fetch(base_url + "/api/membership/check", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return await res.json();
+  };
+
+  const openRazorpay = async (amount, planName) => {
+    try {
+      const res = await fetch(base_url + "/api/payments/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await res.json();
+
+      const options = {
+        key: "rzp_test_Rppyv9WGlg9Bcp",
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.razorpay_order_id || order.id,
+        name: "ChemCO₂",
+        description: planName,
+
+        handler: async function (response) {
+          const verifyRes = await fetch(base_url + "/api/payments/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.status) {
+            toast.success("Payment successful!", { autoClose: 1500 });
+          } else {
+            toast.error("Payment verification failed");
+          }
+        },
+
+        theme: { color: "#137333" },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (err) {
+      console.error(err);
+      toast.error("Payment failed");
+    }
+  };
+
+  const handlePayment = async (amount, planName, selectedDocumentId) => {
+    try {
+      const membership = await handleCheckMembership();
+
+      if (!membership?.hasMembership) {
+        openRazorpay(amount, planName);
+        return;
+      }
+
+      const currentDocumentId = membership?.plan?.documentId;
+      const currentPlanPrice = membership?.plan?.price;
+
+      if (currentDocumentId === selectedDocumentId) {
+        toast.info("You already have this plan. Please choose another plan.", {
+          autoClose: 1500,
+        });
+        return;
+      }
+
+      if (amount < currentPlanPrice) {
+        toast.warning(
+          "Downgrading plans is not allowed. You can only upgrade to a higher plan.",
+          { autoClose: 2000 }
+        );
+        return;
+      }
+
+      openRazorpay(amount, planName);
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to check membership");
+    }
+  };
+
+  useEffect(() => {
+    const pricingData = async () => {
+      try {
+        const res = await fetch(base_url + "/api/membership-plans", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const response = await res.json();
+        setPlans(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Something went wrong!");
+      }
+    };
+    pricingData();
+  }, []);
+
   return (
     <>
+      {/* alert */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       {/*Banner Start*/}
       <div
         className="twm-home1-banner-section site-bg-gray bg-cover"
@@ -69,13 +207,13 @@ function Home1Page() {
                 <span
                   className="site-text-primary"
                   style={{
-                    color: "#A6FF3B"
+                    color: "#A6FF3B",
                     // background: "linear-gradient(90deg, #4FACFE, #9066FF)",
                     // WebkitBackgroundClip: "text",
                     // WebkitTextFillColor: "transparent",
                     // backgroundClip: "text",
                     // color: "transparent",
-                    // display: "inline-block",  
+                    // display: "inline-block",
                   }}
                 >
                   One Carbon Atom
@@ -751,7 +889,7 @@ function Home1Page() {
                     alignItems: "stretch",
                   }}
                 >
-                  <div
+                  {/* <div
                     className="col-lg-3 col-md-6 m-b30"
                     style={{ display: "flex" }}
                   >
@@ -819,12 +957,12 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() => handlePayment(999, "Starter Plan")}
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -888,12 +1026,14 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() =>
+                              handlePayment(2999, "Professional Plan")
+                            }
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -952,12 +1092,14 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() =>
+                              handlePayment(49999, "Enterprise Plan")
+                            }
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1036,16 +1178,91 @@ function Home1Page() {
                           </ul>
                         </div>
                         <div className="p-table-btn">
-                          <NavLink
-                            to={publicUser.pages.ABOUT}
+                          <p
+                            onClick={() => handlePayment(499, "Pay Per Use")}
                             className="site-button"
                           >
                             Purchase Now
-                          </NavLink>
+                          </p>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className={`col-lg-3 col-md-6 m-b30 ${
+                        plan.is_most_popular ? "p-table-highlight" : ""
+                      }`}
+                      style={{ display: "flex" }}
+                    >
+                      <div
+                        className={`pricing-table-1 ${
+                          plan.is_most_popular ? "circle-pink" : ""
+                        }`}
+                        style={{ flexGrow: 1 }}
+                      >
+                        {plan.is_most_popular && (
+                          <div className="p-table-recommended">Popular</div>
+                        )}
+
+                        <div className="p-table-title">
+                          <h4 className="wt-title">{plan.title}</h4>
+                        </div>
+
+                        <div className="p-table-inner">
+                          <div className="p-table-price">
+                            <span>₹{plan.price}/</span>
+                            <p>
+                              {plan.billing_interval === "monthly"
+                                ? "mon"
+                                : plan.billing_interval === "yearly"
+                                ? "year"
+                                : plan.billing_interval === "each"
+                                ? "each"
+                                : ""}
+                            </p>
+                          </div>
+                          <div className="p-table-list">
+                            <ul>
+                              {plan.Pointers?.map((pointer) => (
+                                <li key={pointer.id}>
+                                  <i
+                                    className={
+                                      pointer.is_avaliable
+                                        ? "feather-check"
+                                        : "feather-x"
+                                    }
+                                    style={{
+                                      color: pointer.is_avaliable
+                                        ? "green"
+                                        : "red",
+                                    }}
+                                  />
+                                  {pointer.Name}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="p-table-btn">
+                            <p
+                              className="site-button"
+                              onClick={() =>
+                                handlePayment(
+                                  plan.price,
+                                  `${plan.title} Plan`,
+                                  plan.documentId
+                                )
+                              }
+                            >
+                              Purchase Now
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                   <p>
                     Notes: GST extra • Cancel anytime • Team pricing available
                   </p>

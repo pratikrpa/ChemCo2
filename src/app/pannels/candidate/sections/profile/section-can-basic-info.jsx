@@ -10,6 +10,7 @@ function SectionCandicateBasicInfo() {
     try {
       const response = await fetch(base_url + "/api/users/me", {
         method: "GET",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,

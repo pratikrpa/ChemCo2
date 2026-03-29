@@ -1,17 +1,109 @@
 import React, { useState } from "react";
 import PricingPopup from "./PricingPopUp";
 import { useLocation } from "react-router-dom";
+import html2pdf from "html2pdf.js";
+
+const dummyResponse = {
+  projectName: "Demo Project",
+  summary: {
+    batchId: "BATCH-2023",
+    fabricProcessed: "Cotton Fabric",
+    totalCO2eKg: 1200,
+    CO2ePerKgFabric: 2.35,
+    bioBasedCarbonKg: 300,
+    fossilCarbonKg: 900,
+  },
+  co2eByProcessStage: {
+    perChemical: [
+      {
+        chemical: "Dyeing",
+        fossilCO2eKg: 300,
+        bioCO2eKg: 50,
+        totalCO2eKg: 350,
+      },
+      {
+        chemical: "Bleaching",
+        fossilCO2eKg: 200,
+        bioCO2eKg: 30,
+        totalCO2eKg: 230,
+      },
+    ],
+  },
+  topEmittingChemicals: [
+    {
+      chemical: "Reactive Dye",
+      co2ePerKgProduct: 2.1,
+      annualGlobalCO2eMT: 12000,
+    },
+    {
+      chemical: "Soda Ash",
+      co2ePerKgProduct: 1.6,
+      annualGlobalCO2eMT: 9800,
+    },
+  ],
+};
 
 const InputFormOutput = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const base_url = process.env.REACT_APP_BASE_URL;
   const location = useLocation();
-  const responseData = location.state;
-  console.log("first===" , responseData)
-  const outputData = responseData.data;
+
+  const outputData = location.state?.data || dummyResponse;
+
+  const handleCheckMemberShip = async () => {
+    const token = localStorage.getItem("jwt");
+    try {
+      const res = await fetch(base_url + "/api/membership/check", {
+        method: "GET",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const response = await res.json();
+      if (response?.hasMembership) {
+        handleDownloadPDF();
+      } else {
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    const element = document.getElementById("pdf-content");
+    const downloadBtn = document.querySelector(".btn-custom-download");
+
+    // Hide button
+    if (downloadBtn) downloadBtn.style.display = "none";
+
+    const options = {
+      margin: 10,
+      filename: `${outputData?.projectName || "Batch_CO2_Report"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf()
+      .set(options)
+      .from(element)
+      .save()
+      .then(() => {
+        // Restore button
+        if (downloadBtn) downloadBtn.style.display = "inline-block";
+      });
+  };
 
   return (
     <>
-      <div className="container my-5 p-4 bg-white rounded shadow">
+      <div
+        id="pdf-content"
+        className="container my-5 p-4 bg-white rounded shadow"
+      >
         <h2 className="green_text mb-4">Batch CO₂e Report</h2>
 
         {/* Summary Section */}
@@ -24,7 +116,8 @@ const InputFormOutput = () => {
                   <strong>Batch ID:</strong> {outputData?.summary?.batchId}
                 </p>
                 <p>
-                  <strong>Fabric Processed:</strong> {outputData?.summary?.fabricProcessed}
+                  <strong>Fabric Processed:</strong>{" "}
+                  {outputData?.summary?.fabricProcessed}
                 </p>
                 <p>
                   <strong>Total CO₂e:</strong>{" "}
@@ -39,14 +132,18 @@ const InputFormOutput = () => {
                 <p>
                   <strong>CO₂e / kg Fabric:</strong>{" "}
                   <span className="fw-bold green_text">
-                    {Number(outputData?.summary?.CO2ePerKgFabric).toFixed(2)}
+                    {Number(outputData?.summary?.CO2ePerKgFabric || 0).toFixed(
+                      2
+                    )}
                   </span>
                 </p>
                 <p>
-                  <strong>Bio-Based Carbon:</strong> {outputData?.summary?.bioBasedCarbonKg}
+                  <strong>Bio-Based Carbon:</strong>{" "}
+                  {outputData?.summary?.bioBasedCarbonKg}
                 </p>
                 <p>
-                  <strong>Fossil Carbon:</strong> {outputData?.summary?.fossilCarbonKg}
+                  <strong>Fossil Carbon:</strong>{" "}
+                  {outputData?.summary?.fossilCarbonKg}
                 </p>
               </div>
             </div>
@@ -67,16 +164,16 @@ const InputFormOutput = () => {
                 </tr>
               </thead>
               <tbody>
-                {outputData?.co2eByProcessStage?.perChemical.map((data,ind) => {
-                  return (
+                {outputData?.co2eByProcessStage?.perChemical?.map(
+                  (data, ind) => (
                     <tr key={ind}>
                       <td>{data?.chemical}</td>
                       <td>{data?.fossilCO2eKg}</td>
                       <td>{data?.bioCO2eKg}</td>
                       <td>{data?.totalCO2eKg}</td>
                     </tr>
-                  );
-                })}
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -95,22 +192,21 @@ const InputFormOutput = () => {
                 </tr>
               </thead>
               <tbody>
-                {outputData?.topEmittingChemicals.map((data, ind) => {
-                  return (
-                    <tr key={ind}>
-                      <td>{data?.chemical}</td>
-                      <td>{data?.co2ePerKgProduct}</td>
-                      <td>{data?.annualGlobalCO2eMT}</td>
-                    </tr>
-                  );
-                })}
+                {outputData?.topEmittingChemicals?.map((data, ind) => (
+                  <tr key={ind}>
+                    <td>{data?.chemical}</td>
+                    <td>{data?.co2ePerKgProduct}</td>
+                    <td>{data?.annualGlobalCO2eMT}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+
           <div className="d-flex align-items-end justify-content-end">
             <button
-              class="btn btn-custom-download "
-              onClick={() => setShowPopup(true)}
+              className="btn btn-custom-download"
+              onClick={() => handleCheckMemberShip()}
             >
               📥 Download
             </button>

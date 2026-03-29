@@ -1,178 +1,235 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PricingPopup = ({ onClose }) => {
+  const base_url = process.env.REACT_APP_BASE_URL;
+  const [plans, setPlans] = useState([]);
+
+  const handlePayment = async (amount, planName) => {
+    try {
+      const res = await fetch(base_url + "/api/payments/create", {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await res.json();
+
+      const options = {
+        key: "rzp_test_Rppyv9WGlg9Bcp",
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.razorpay_order_id || order.id,
+        name: "ChemCO₂",
+        description: planName,
+
+        handler: async function (response) {
+          const verifyRes = await fetch(base_url + "/api/payments/verify", {
+            method: "POST",
+            // credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.status) {
+            toast.success("Payment successful!", {
+              autoClose: 1500,
+            });
+            setTimeout(() => {
+              onClose();
+            }, 1600);
+          } else {
+            toast.error("Payment verification failed");
+          }
+        },
+
+        theme: {
+          color: "#137333",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (err) {
+      console.error(err);
+      toast.error("Payment failed");
+    }
+  };
+
+  useEffect(() => {
+    const pricingData = async () => {
+      try {
+        const res = await fetch(base_url + "/api/membership-plans", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const response = await res.json();
+        console.log("first========", response?.data);
+        setPlans(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Something went wrong!");
+      }
+    };
+    pricingData();
+  }, []);
+
   return (
-    <div
-      className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center"
-      style={{ zIndex: 1055 }}
-    >
+    <>
+      {/* alert */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       <div
-        className="bg-white p-4 rounded-4 shadow w-100 position-relative overflow-auto"
-        style={{ maxWidth: "800px", maxHeight: "95vh" }}
+        className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center"
+        style={{ zIndex: 1055 }}
       >
-        {/* ❌ Close Button */}
-        <div className="d-flex  justify-content-end">
-          <button
-            onClick={onClose}
-            className="btn-close position-absolute top-3 end-3"
-          ></button>
-        </div>
-
-        {/* 🔤 Title */}
-        <h2 className="fw-bold text-center mb-4" style={{ fontSize: "28px" }}>
-          Choose Your Plan
-        </h2>
-
-        {/* 🟢 Toggle Button UI */}
-        <div className="d-flex justify-content-center mb-5">
-          <div
-            className="d-flex bg-light rounded-pill p-1"
-            style={{ gap: "4px" }}
-          >
+        <div
+          className="bg-white p-4 rounded-4 shadow w-100 position-relative overflow-auto"
+          style={{ maxWidth: "100%", maxHeight: "100vh" }}
+        >
+          <div className="d-flex  justify-content-end">
             <button
-              className="btn btn-sm px-4 py-1 rounded-pill"
-              style={{
-                fontSize: "14px",
-                backgroundColor: "transparent",
-                color: "#000",
-                fontWeight: 500,
-              }}
-            >
-              Monthly
-            </button>
-            <button
-              className="btn btn-sm px-4 py-1 rounded-pill"
-              style={{
-                fontSize: "14px",
-                backgroundColor: "#e6f4ea",
-                color: "#137333",
-                fontWeight: 600,
-              }}
-            >
-              Yearly
-            </button>
-          </div>
-        </div>
-
-        {/* 💳 Pricing Cards */}
-        <div className="row g-4">
-          {/* Monthly Plan */}
-          <div className="col-md-4">
-            <div className="border rounded-4 text-center p-4 h-100">
-              <div
-                className="fw-bold mb-1"
-                style={{ fontSize: "28px", color: "#137333" }}
-              >
-                ₹199 <span style={{ fontSize: "16px" }}>/month</span>
-              </div>
-              <p className="fw-semibold" style={{ fontSize: "18px" }}>
-                Monthly Plan
-              </p>
-              <ul
-                className="text-start list-unstyled mt-3 mb-4"
-                style={{ fontSize: "14px", color: "#333" }}
-              >
-                <li>• Feature one</li>
-                <li>• Feature two</li>
-                <li>• Feature three</li>
-              </ul>
-              <button
-                className="w-100 rounded-3 border-0 py-2 fw-semibold"
-                style={{ backgroundColor: "#137333", color: "#fff" }}
-              >
-                Subscribe
-              </button>
-            </div>
+              onClick={onClose}
+              className="btn-close position-absolute top-3 end-3"
+            ></button>
           </div>
 
-          {/* Yearly Plan */}
-          <div className="col-md-4">
+          <h2 className="fw-bold text-center mb-4" style={{ fontSize: "28px" }}>
+            Choose Your Plan
+          </h2>
+          <div className="pricing-block-outer">
             <div
-              className="border border-2 border-success rounded-4 text-center p-4 h-100 position-relative"
-              style={{ borderColor: "#137333" }}
+              className="row justify-content-center"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "stretch",
+              }}
             >
-              <span
-                className="position-absolute text-white px-2 py-1 rounded-bottom-start"
-                style={{
-                  top: "0",
-                  right: "0",
-                  fontSize: "12px",
-                  backgroundColor: "#f29900",
-                  fontWeight: "600",
-                }}
-              >
-                Most Popular
-              </span>
-              <div
-                className="fw-bold mb-1"
-                style={{ fontSize: "28px", color: "#137333" }}
-              >
-                ₹1499 <span style={{ fontSize: "16px" }}>/year</span>
-              </div>
-              <p
-                className="mb-2"
-                style={{
-                  fontSize: "14px",
-                  color: "#137333",
-                  fontWeight: "500",
-                }}
-              >
-                Save ₹889
-              </p>
-              <p className="fw-semibold" style={{ fontSize: "18px" }}>
-                Yearly Plan
-              </p>
-              <ul
-                className="text-start list-unstyled mt-3 mb-4"
-                style={{ fontSize: "14px", color: "#333" }}
-              >
-                <li>• Feature one</li>
-                <li>• Feature two</li>
-                <li>• Feature three</li>
-              </ul>
-              <button
-                className="w-100 rounded-3 border-0 py-2 fw-semibold"
-                style={{ backgroundColor: "#137333", color: "#fff" }}
-              >
-                Subscribe
-              </button>
-              <p className="text-muted small mt-2" style={{ fontSize: "12px" }}>
-                Cancel anytime • Secure payment
-              </p>
-            </div>
-          </div>
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`col-lg-3 col-md-6 m-b30 ${
+                    plan.is_most_popular ? "p-table-highlight" : ""
+                  }`}
+                  style={{ display: "flex" }}
+                >
+                  <div
+                    className={`pricing-table-1 ${
+                      plan.is_most_popular ? "circle-pink" : ""
+                    }`}
+                    style={{ flexGrow: 1 }}
+                  >
+                    {plan.is_most_popular && (
+                      <div className="p-table-recommended">Popular</div>
+                    )}
 
-          {/* One-Time Plan */}
-          <div className="col-md-4">
-            <div className="border rounded-4 text-center p-4 h-100">
-              <div
-                className="fw-bold mb-1"
-                style={{ fontSize: "28px", color: "#137333" }}
-              >
-                ₹99
-              </div>
-              <p className="fw-semibold" style={{ fontSize: "18px" }}>
-                One-Time Use
-              </p>
-              <ul
-                className="text-start list-unstyled mt-3 mb-4"
-                style={{ fontSize: "14px", color: "#333" }}
-              >
-                <li>• Feature one</li>
-                <li>• Feature two</li>
-                <li>• Feature three</li>
-              </ul>
-              <button
-                className="w-100 rounded-3 border-0 py-2 fw-semibold"
-                style={{ backgroundColor: "#137333", color: "#fff" }}
-              >
-                Buy Now
-              </button>
+                    <div className="p-table-title">
+                      <h4 className="wt-title">{plan.title}</h4>
+                    </div>
+
+                    <div className="p-table-inner">
+                      <div className="p-table-price">
+                        <span>₹{plan.price}/</span>
+                        <p>
+                          {plan.billing_interval === "monthly"
+                            ? "mon"
+                            : plan.billing_interval === "yearly"
+                            ? "year"
+                            : plan.billing_interval === "each"
+                            ? "each"
+                            : ""}
+                        </p>
+                      </div>
+
+                      {/* <div className="p-table-list">
+                        <ul>
+                          {plan.description.map((item, idx) => {
+                            const feature = item.children?.[0]?.text || "";
+
+                            const enabled =
+                              typeof item.isAvailable === "boolean"
+                                ? item.isAvailable
+                                : Math.random() > 0.5;
+
+                            return (
+                              <li key={idx}>
+                                <i
+                                  className={
+                                    enabled ? "feather-check" : "feather-x"
+                                  }
+                                  style={{
+                                    color: enabled ? "green" : "red",
+                                  }}
+                                />
+                                {feature}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div> */}
+                      <div className="p-table-list">
+                        <ul>
+                          {plan.Pointers?.map((pointer) => (
+                            <li key={pointer.id}>
+                              <i
+                                className={
+                                  pointer.is_avaliable
+                                    ? "feather-check"
+                                    : "feather-x"
+                                }
+                                style={{
+                                  color: pointer.is_avaliable ? "green" : "red",
+                                }}
+                              />
+                              {pointer.Name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="p-table-btn">
+                        <p
+                          className="site-button"
+                          onClick={() =>
+                            handlePayment(plan.price, `${plan.title} Plan`)
+                          }
+                        >
+                          Purchase Now
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <p>Notes: GST extra • Cancel anytime • Team pricing available</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

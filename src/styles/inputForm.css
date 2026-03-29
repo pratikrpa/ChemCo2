@@ -1,3 +1,21 @@
 .inputFormSec {
   padding: 80px;
 }
+
+.react-select__control {
+  min-height: 57px !important;
+  border: none !important;
+  background: #f0f6fe !important;
+}
+
+.react-select__control--is-focused {
+  min-height: 57px !important;
+  border: none !important;
+  background: #f0f6fe !important;
+}
+
+.react-select__control--menu-is-open {
+  min-height: 57px !important;
+  border: none !important;
+  background: #f0f6fe !important;
+}
